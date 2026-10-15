@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Middle School Science Lab Skills Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#2563EB',
+                            teal: '#0D9488',
+                            purple: '#7C3AED',
+                            amber: '#D97706',
+                            rose: '#E11D48',
+                            dark: '#0F172A',
+                            light: '#F8FAFC'
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Fredoka', 'sans-serif'],
+                        body: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, .font-heading { font-family: 'Fredoka', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- TOP HEADER / NAV -->
+    <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-indigo-950 font-bold text-2xl shadow-inner">
+                    <i class="fa-solid fa-flask"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-wide leading-tight">Science Lab Master</h1>
+                    <p class="text-xs text-indigo-200">Interactive Middle School Science Measurement & Skills Trainer</p>
+                </div>
+            </div>
+
+            <!-- Global Mode Tabs -->
+            <div class="flex items-center bg-indigo-950 p-1.5 rounded-2xl border border-indigo-700/50 space-x-1">
+                <button id="nav-practice" onclick="switchMainTab('practice')" class="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center space-x-2 bg-indigo-600 text-white shadow">
+                    <i class="fa-solid fa-compass"></i>
+                    <span>Lab Practice</span>
+                </button>
+                <button id="nav-challenge" onclick="switchMainTab('challenge')" class="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center space-x-2 text-indigo-200 hover:text-white">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>
+                    <span>Skill Assessment</span>
+                </button>
+                <button id="nav-stats" onclick="switchMainTab('stats')" class="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center space-x-2 text-indigo-200 hover:text-white">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Scoreboard</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTENT -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6">
+
+        <!-- TAB 1: PRACTICE MODE -->
+        <div id="tab-practice-view" class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            <!-- Sidebar Navigation -->
+            <div class="lg:col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-heading text-indigo-950 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i> Lab Stations
+                    </h2>
+                    <p class="text-xs text-slate-500 mb-3">Select an instrument to practice.</p>
+                    
+                    <nav class="space-y-1.5 max-h-[460px] overflow-y-auto pr-1 custom-scrollbar" id="skill-menu">
+                        <!-- Populated by JS -->
+                    </nav>
+                </div>
+
+                <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2.5">
+                    <i class="fa-solid fa-lightbulb text-amber-600 text-base mt-0.5"></i>
+                    <p class="text-xs text-amber-900 leading-snug">
+                        Use sliders to test measurements. Once confident, test your skills in the <b>Skill Assessment</b> exam!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Workspace Viewport -->
+            <div class="lg:col-span-3 bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                <div>
+                    <!-- Station Header -->
+                    <div class="flex flex-wrap justify-between items-center border-b border-slate-100 pb-3 mb-4 gap-2">
+                        <div>
+                            <span id="station-badge" class="px-2.5 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-bold uppercase rounded-md tracking-wider">Station 1</span>
+                            <h2 id="station-title" class="text-2xl font-heading text-slate-800 mt-0.5">Skill Title</h2>
+                        </div>
+                        <button onclick="resetCurrentStation()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate-right"></i> Reset Tool
+                        </button>
+                    </div>
+
+                    <!-- Visual Instrument Interactive Area -->
+                    <div id="interactive-viewport" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 min-h-[360px] flex items-center justify-center relative overflow-hidden shadow-inner">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- Station Learning Card & Self Check -->
+                    <div class="mt-5 bg-indigo-50/60 border border-indigo-100 rounded-xl p-4">
+                        <h3 class="font-heading text-indigo-950 text-base mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-book-open text-indigo-600"></i> Measurement Guide & How To Read
+                        </h3>
+                        <p id="station-instructions" class="text-xs md:text-sm text-slate-700 leading-relaxed mb-4">
+                            Instructions...
+                        </p>
+                        
+                        <!-- Quick Practice Check -->
+                        <div class="border-t border-indigo-100 pt-3">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <span class="text-[11px] font-bold text-indigo-900 uppercase tracking-wider">Quick Check Question</span>
+                                <span id="quick-feedback" class="text-xs font-bold"></span>
+                            </div>
+                            <p id="quick-question-text" class="text-sm font-medium text-slate-800 mb-2">Question...</p>
+                            <div id="quick-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <!-- Choices dynamic -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Navigation -->
+                <div class="flex justify-between items-center mt-6 pt-3 border-t border-slate-100">
+                    <button id="btn-prev-station" onclick="navigateStation(-1)" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl font-medium text-xs md:text-sm hover:bg-slate-300 transition flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-left"></i> Previous
+                    </button>
+                    <span id="station-counter" class="text-xs font-bold text-slate-500">1 of 8</span>
+                    <button id="btn-next-station" onclick="navigateStation(1)" class="px-4 py-2 bg-indigo-600 text-white rounded-xl font-medium text-xs md:text-sm hover:bg-indigo-700 transition flex items-center gap-1">
+                        Next <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: SKILL ASSESSMENT EXAM MODE -->
+        <div id="tab-challenge-view" class="hidden max-w-4xl mx-auto bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200/80">
+            
+            <!-- Setup Form -->
+            <div id="exam-setup-card" class="space-y-6">
+                <div class="text-center max-w-lg mx-auto">
+                    <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h2 class="text-3xl font-heading text-indigo-950">Science Measurement Exam</h2>
+                    <p class="text-slate-600 text-sm mt-1">10 comprehensive questions covering all 8 lab equipment stations and observational skills.</p>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 max-w-md mx-auto space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Student Full Name</label>
+                        <input type="text" id="student-name" placeholder="e.g. Jordan Smith" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Class Period / Teacher Name</label>
+                        <input type="text" id="student-class" placeholder="e.g. Period 4 - Mr. Davis" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 text-sm">
+                    </div>
+                    <button onclick="startChallengeExam()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Begin Assessment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Test Cards -->
+            <div id="exam-active-card" class="hidden">
+                <div class="flex justify-between items-center pb-3 mb-4 border-b border-slate-200">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Question <span id="exam-q-num">1</span> of 10</span>
+                        <h3 class="text-xl font-heading text-indigo-950" id="exam-q-title">Station Title</h3>
+                    </div>
+                    <div class="bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100 text-right">
+                        <span class="text-[10px] text-indigo-600 uppercase font-bold block">Current Score</span>
+                        <span id="exam-live-score" class="text-base font-extrabold text-indigo-900">0 pts</span>
+                    </div>
+                </div>
+
+                <!-- Canvas Visual Viewport for Question -->
+                <div id="exam-interactive-stage" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 min-h-[300px] flex items-center justify-center mb-5 relative overflow-hidden">
+                    <!-- Dynamic rendering -->
+                </div>
+
+                <!-- Question Prompt -->
+                <p id="exam-question-prompt" class="text-slate-800 font-semibold text-base mb-4">
+                    Prompt text...
+                </p>
+
+                <!-- Input or Choice List -->
+                <div id="exam-answer-container" class="space-y-2.5 mb-6">
+                    <!-- Choices -->
+                </div>
+
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <span id="exam-feedback-msg" class="text-sm font-bold"></span>
+                    <button id="exam-submit-btn" onclick="submitExamAnswer()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow transition text-sm flex items-center gap-1.5">
+                        Submit Answer <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Report Card & Certificate -->
+            <div id="exam-report-card" class="hidden">
+                <div class="bg-amber-50/60 border-4 border-amber-300 rounded-2xl p-6 md:p-8 relative">
+                    <div class="text-center pb-4 border-b-2 border-dashed border-amber-200">
+                        <div class="inline-block px-3 py-1 bg-amber-400 text-indigo-950 rounded-full font-bold text-xs tracking-wider uppercase mb-1">Official Mastery Certification</div>
+                        <h2 class="text-3xl font-heading text-indigo-950">Middle School Science Lab Certification</h2>
+                        <p class="text-slate-600 text-xs mt-0.5">Measurement Skills & Lab Equipment Proficiency Evaluation</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 my-5 text-center">
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Student Name</span>
+                            <span id="report-name" class="font-bold text-indigo-950 text-sm">---</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Class / Teacher</span>
+                            <span id="report-class" class="font-bold text-indigo-950 text-sm">---</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm col-span-2 sm:col-span-1">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Date</span>
+                            <span id="report-date" class="font-bold text-indigo-950 text-sm">---</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-4 border border-slate-200 text-center mb-5 shadow-sm">
+                        <div class="text-xs uppercase font-bold text-slate-400">Final Assessment Score</div>
+                        <div class="text-5xl font-heading text-indigo-600 my-1" id="report-score-big">0%</div>
+                        <p class="text-xs md:text-sm font-bold text-slate-700" id="report-verdict">Great Effort!</p>
+                    </div>
+
+                    <!-- Question Breakdown Review -->
+                    <div class="space-y-2 mb-6">
+                        <h4 class="font-bold text-xs uppercase text-slate-500 tracking-wider">Detailed Answer Breakdown</h4>
+                        <div id="report-breakdown" class="grid grid-cols-1 gap-2 text-xs max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+                            <!-- Breakdown list -->
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3 no-print justify-center pt-2">
+                        <button onclick="window.print()" class="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition text-xs md:text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-print"></i> Print Grade Certificate
+                        </button>
+                        <button onclick="resetChallengeExam()" class="px-5 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition text-xs md:text-sm">
+                            Retake Assessment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: SCOREBOARD -->
+        <div id="tab-stats-view" class="hidden max-w-4xl mx-auto bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-heading text-indigo-950">Student Scoreboard History</h2>
+                    <p class="text-slate-500 text-xs">Saved assessment results on this browser.</p>
+                </div>
+                <button onclick="clearScoreHistory()" class="px-3 py-1.5 bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 rounded-xl text-xs font-bold transition">
+                    <i class="fa-solid fa-trash mr-1"></i> Clear Local Scores
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase">
+                            <th class="p-3">Date</th>
+                            <th class="p-3">Student Name</th>
+                            <th class="p-3">Class Period</th>
+                            <th class="p-3">Score</th>
+                            <th class="p-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoreboard-rows" class="divide-y divide-slate-100 text-xs md:text-sm">
+                        <!-- Rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-3 mt-8 no-print text-center text-xs text-slate-500">
+        <p>Aligned with Middle School Next Generation Science Standards (NGSS SEP-3: Planning & Carrying Out Investigations)</p>
+    </footer>
+
+    <script>
+        // --- DATA STRUCTURES & APP STATE ---
+        const STATIONS = [
+            {
+                id: 'data-types',
+                title: 'Quantitative vs. Qualitative Data',
+                icon: 'fa-scale-unbalanced',
+                badge: 'Station 1',
+                instructions: '<b>Quantitative data</b> relies on numbers, quantities, counters, and measurements (e.g. 24.5 cm, 12 grams, 3 leaves). <b>Qualitative data</b> describes characteristics, qualities, colors, textures, or sensory observations (e.g. dark green, rough surface, effervescent).'
+            },
+            {
+                id: 'ruler',
+                title: 'Reading a Metric Ruler',
+                icon: 'fa-ruler',
+                badge: 'Station 2',
+                instructions: 'Metric rulers measure in <b>centimeters (cm)</b> and <b>millimeters (mm)</b>. There are 10 mm in 1 cm. Every small tick mark equals 0.1 cm (1 mm). Always read from the zero line and include 1 estimated decimal place!'
+            },
+            {
+                id: 'cylinder',
+                title: 'Reading a Graduated Cylinder',
+                icon: 'fa-vial',
+                badge: 'Station 3',
+                instructions: 'Water molecules cling to glass walls creating a curved top liquid boundary called the <b>meniscus</b>. Lower your line of sight directly level with the liquid line and read volume from the <b>BOTTOM</b> of the downward curve!'
+            },
+            {
+                id: 'spring-scale',
+                title: 'Reading a Spring Scale',
+                icon: 'fa-weight-hanging',
+                badge: 'Station 4',
+                instructions: 'Spring scales measure gravitational force in <b>Newtons (N)</b> and equivalent mass in <b>Grams (g)</b>. Read the exact line where the top metal indicator disk stops along the vertical ruler.'
+            },
+            {
+                id: 'psychrometer',
+                title: 'Sling Psychrometer & Humidity Chart',
+                icon: 'fa-temperature-half',
+                badge: 'Station 5',
+                instructions: 'A sling psychrometer features a <b>Dry Bulb</b> (ambient air temperature) and a wet cloth <b>Wet Bulb</b>. Evaporation cools the wet bulb. Calculate the difference (Dry minus Wet) and locate the intersection on the Relative Humidity Lookup Chart!'
+            },
+            {
+                id: 'barometer',
+                title: 'Reading an Aneroid Barometer',
+                icon: 'fa-gauge-high',
+                badge: 'Station 6',
+                instructions: 'Barometers track atmospheric pressure in <b>hectopascals/millibars (hPa / mb)</b> and <b>millimeters of mercury (mmHg)</b>. High pressure usually signals clear sunny weather, while dropping low pressure warns of approaching rain or storms.'
+            },
+            {
+                id: 'triple-beam',
+                title: 'Reading a Triple Beam Balance',
+                icon: 'fa-scale-balanced',
+                badge: 'Station 7',
+                instructions: 'Measure mass by sliding rider weights into beam notches: <b>100g beam</b> + <b>10g beam</b> + <b>1g decimal slider beam</b>. Sum all three rider values together to find the object mass in grams!'
+            },
+            {
+                id: 'drawing',
+                title: 'Making Scientific Drawings',
+                icon: 'fa-pen-nib',
+                badge: 'Station 8',
+                instructions: 'Apply the <b>ABCD Standard</b>: <b>A</b>ccurate (true biological form), <b>B</b>ig (filling >50% space), <b>C</b>lean (sharp pencil lines without shading/smudges), and <b>D</b>etailed (clear labels connected with ruler straight lines).'
+            }
+        ];
+
+        // RELATIVE HUMIDITY LOOKUP TABLE DATA (%)
+        // Rows = Dry Bulb Temp (°C), Cols = Dry-Wet Temp Difference (°C)
+        const RH_LOOKUP = {
+            18: { 0: 100, 1: 91, 2: 82, 3: 73, 4: 65, 5: 57, 6: 49 },
+            20: { 0: 100, 1: 91, 2: 83, 3: 74, 4: 66, 5: 59, 6: 51 },
+            22: { 0: 100, 1: 92, 2: 84, 3: 76, 4: 68, 5: 61, 6: 54 },
+            24: { 0: 100, 1: 92, 2: 85, 3: 77, 4: 70, 5: 63, 6: 56 },
+            26: { 0: 100, 1: 93, 2: 86, 3: 79, 4: 72, 5: 65, 6: 58 },
+            28: { 0: 100, 1: 93, 2: 87, 3: 80, 4: 73, 5: 67, 6: 60 }
+        };
+
+        let currentStationIdx = 0;
+        let activeTab = 'practice';
+
+        // Interactive Practice State Variables
+        let practiceState = {
+            rulerPos: 4.3,
+            cylinderVol: 34,
+            springForce: 2.5,
+            dryTemp: 24,
+            wetTemp: 19,
+            baroPressure: 1013,
+            tb100: 200,
+            tb10: 40,
+            tb1: 3.6,
+            drawingItems: { accurate: true, big: true, clean: true, detailed: true }
+        };
+
+        // Assessment State Variables
+        let examQuestions = [];
+        let examCurrentIdx = 0;
+        let examScore = 0;
+        let examAnswersLog = [];
+
+        // --- APP INIT ---
+        window.onload = function() {
+            renderSkillMenu();
+            loadStation(0);
+            renderScoreboard();
+        };
+
+        function switchMainTab(tabName) {
+            activeTab = tabName;
+            document.getElementById('tab-practice-view').classList.toggle('hidden', tabName !== 'practice');
+            document.getElementById('tab-challenge-view').classList.toggle('hidden', tabName !== 'challenge');
+            document.getElementById('tab-stats-view').classList.toggle('hidden', tabName !== 'stats');
+
+            ['practice', 'challenge', 'stats'].forEach(t => {
+                const btn = document.getElementById(`nav-${t}`);
+                if (t === tabName) {
+                    btn.className = "px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center space-x-2 bg-indigo-600 text-white shadow";
+                } else {
+                    btn.className = "px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center space-x-2 text-indigo-200 hover:text-white";
+                }
+            });
+        }
+
+        // --- PRACTICE STATION LOGIC ---
+        function renderSkillMenu() {
+            const menu = document.getElementById('skill-menu');
+            menu.innerHTML = STATIONS.map((s, idx) => `
+                <button onclick="loadStation(${idx})" class="w-full text-left p-2 rounded-xl transition flex items-center space-x-2.5 ${idx === currentStationIdx ? 'bg-indigo-50 border border-indigo-200 text-indigo-950 font-bold shadow-sm' : 'hover:bg-slate-50 text-slate-600'}">
+                    <div class="w-7 h-7 rounded-lg ${idx === currentStationIdx ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'} flex items-center justify-center text-xs flex-shrink-0">
+                        <i class="fa-solid ${s.icon}"></i>
+                    </div>
+                    <span class="truncate text-xs">${s.title}</span>
+                </button>
+            `).join('');
+        }
+
+        function loadStation(idx) {
+            currentStationIdx = idx;
+            renderSkillMenu();
+
+            const st = STATIONS[idx];
+            document.getElementById('station-badge').innerText = st.badge;
+            document.getElementById('station-title').innerText = st.title;
+            document.getElementById('station-instructions').innerHTML = st.instructions;
+            document.getElementById('station-counter').innerText = `${idx + 1} of ${STATIONS.length}`;
+
+            document.getElementById('btn-prev-station').disabled = idx === 0;
+            document.getElementById('btn-next-station').disabled = idx === STATIONS.length - 1;
+
+            document.getElementById('quick-feedback').innerText = '';
+
+            renderInteractiveTool(st.id);
+            renderQuickQuestion(st.id);
+        }
+
+        function navigateStation(dir) {
+            const nextIdx = currentStationIdx + dir;
+            if (nextIdx >= 0 && nextIdx < STATIONS.length) {
+                loadStation(nextIdx);
+            }
+        }
+
+        function resetCurrentStation() {
+            loadStation(currentStationIdx);
+        }
+
+        // --- DYNAMIC INSTRUMENT GRAPHICS RENDERERS ---
+
+        // SVG Ruler Generator
+        function drawSVGRuler(val) {
+            let ticks = '';
+            for(let i=0; i<=100; i++) {
+                const x = 30 + i * 4.2;
+                let h = 8;
+                if (i % 10 === 0) {
+                    h = 24;
+                    const cmNum = i / 10;
+                    ticks += `<text x="${x}" y="78" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">${cmNum}</text>`;
+                } else if (i % 5 === 0) {
+                    h = 16;
+                }
+                ticks += `<line x1="${x}" y1="20" x2="${x}" y2="${20 + h}" stroke="#475569" stroke-width="${i%10===0?2:1}"/>`;
+            }
+
+            const posX = 30 + val * 42;
+            return `
+                <svg viewBox="0 0 480 110" class="w-full max-w-lg h-auto drop-shadow-md">
+                    <!-- Ruler Body -->
+                    <rect x="10" y="15" width="460" height="85" fill="#fef3c7" stroke="#d97706" stroke-width="3" rx="6"/>
+                    <text x="25" y="92" font-size="9" font-weight="bold" fill="#b45309">METRIC (cm)</text>
+                    ${ticks}
+                    <!-- Pointer Marker -->
+                    <g transform="translate(${posX}, 0)">
+                        <line x1="0" y1="5" x2="0" y2="60" stroke="#e11d48" stroke-width="3"/>
+                        <polygon points="0,60 -6,46 6,46" fill="#e11d48"/>
+                        <circle cx="0" cy="5" r="4" fill="#e11d48"/>
+                    </g>
+                </svg>
+            `;
+        }
+
+        // SVG Graduated Cylinder Generator (CRITICAL BUG FIX 1)
+        function drawSVGCylinder(volume, maxVol = 50) {
+            let ticks = '';
+            for (let i = 0; i <= maxVol; i++) {
+                const y = 220 - (i / maxVol) * 180;
+                let strokeW = 1;
+                let lineW = 10;
+                if (i % 10 === 0) {
+                    strokeW = 2;
+                    lineW = 20;
+                    ticks += `<text x="${45 - lineW - 4}" y="${y + 3}" font-size="9" font-weight="bold" fill="#334155" text-anchor="end">${i}</text>`;
+                } else if (i % 5 === 0) {
+                    lineW = 15;
+                    strokeW = 1.5;
+                }
+                ticks += `<line x1="${45 - lineW}" y1="${y}" x2="45" y2="${y}" stroke="#475569" stroke-width="${strokeW}"/>`;
+            }
+
+            const fillY = 220 - (volume / maxVol) * 180;
+
+            return `
+                <svg viewBox="0 0 160 250" class="w-36 h-64 drop-shadow-md">
+                    <!-- Base -->
+                    <path d="M 30 235 L 130 235 L 120 225 L 40 225 Z" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+                    <!-- Cylinder Glass Tube -->
+                    <rect x="45" y="25" width="70" height="195" fill="#f1f5f9" stroke="#64748b" stroke-width="3" rx="3" opacity="0.85"/>
+                    <!-- Liquid Body -->
+                    <rect x="47" y="${fillY}" width="66" height="${220 - fillY}" fill="#3b82f6" opacity="0.6"/>
+                    
+                    <!-- Curved Downward Meniscus (CRITICAL FIX) -->
+                    <path d="M 47 ${fillY} Q 80 ${fillY + 12} 113 ${fillY}" fill="#2563eb" opacity="0.8" stroke="#1d4ed8" stroke-width="2"/>
+
+                    <!-- Graduated Scale Marks -->
+                    ${ticks}
+
+                    <text x="80" y="18" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle">mL</text>
+                </svg>
+            `;
+        }
+
+        // SVG Spring Scale Generator (CRITICAL BUG FIX 4)
+        function drawSVGSpringScale(forceN) {
+            const grams = Math.round(forceN * 100);
+            const maxForce = 5.0;
+            const stretchY = (forceN / maxForce) * 120;
+            const markerY = 45 + stretchY;
+
+            return `
+                <svg viewBox="0 0 160 260" class="w-36 h-64 drop-shadow-md">
+                    <!-- Top Ring -->
+                    <circle cx="80" cy="15" r="10" fill="none" stroke="#475569" stroke-width="4"/>
+                    <!-- Main Body Casing -->
+                    <rect x="35" y="25" width="90" height="185" rx="8" fill="#e2e8f0" stroke="#64748b" stroke-width="3"/>
+                    <rect x="70" y="40" width="20" height="135" fill="#cbd5e1" rx="3" stroke="#94a3b8"/>
+                    
+                    <!-- Internal Spring -->
+                    <path d="M 80 40 L 80 ${40 + stretchY/2}" stroke="#475569" stroke-width="3" fill="none" stroke-dasharray="3 3"/>
+                    
+                    <!-- Red Indicator Disc/Line -->
+                    <rect x="52" y="${markerY}" width="56" height="5" fill="#e11d48" rx="1"/>
+                    <polygon points="46,${markerY+2.5} 52,${markerY} 52,${markerY+5}" fill="#e11d48"/>
+
+                    <!-- Left Scale Marks (Newtons) -->
+                    <text x="48" y="48" font-size="8" font-weight="bold" fill="#0f172a">0N</text>
+                    <text x="48" y="108" font-size="8" font-weight="bold" fill="#0f172a">2.5N</text>
+                    <text x="48" y="168" font-size="8" font-weight="bold" fill="#0f172a">5.0N</text>
+
+                    <!-- Right Scale Marks (Grams) -->
+                    <text x="112" y="48" font-size="8" font-weight="bold" fill="#0f172a">0g</text>
+                    <text x="112" y="108" font-size="8" font-weight="bold" fill="#0f172a">250g</text>
+                    <text x="112" y="168" font-size="8" font-weight="bold" fill="#0f172a">500g</text>
+
+                    <!-- Hanging Hook & Weight Mass -->
+                    <path d="M 80 ${markerY + 5} L 80 ${200 + stretchY*0.2} Q 80 ${215 + stretchY*0.2} 65 ${215 + stretchY*0.2}" stroke="#334155" stroke-width="4" fill="none"/>
+                    <rect x="50" y="${215 + stretchY*0.2}" width="30" height="25" rx="4" fill="#64748b"/>
+                    <text x="65" y="${231 + stretchY*0.2}" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">${grams}g</text>
+                </svg>
+            `;
+        }
+
+        // SVG Barometer Generator (CRITICAL BUG FIX 3)
+        function drawSVGBarometer(hPa) {
+            const minP = 960;
+            const maxP = 1050;
+            const angle = ((hPa - minP) / (maxP - minP)) * 260 - 130;
+            const inHg = (hPa * 0.02953).toFixed(2);
+
+            return `
+                <svg viewBox="0 0 220 220" class="w-56 h-56 drop-shadow-md">
+                    <!-- Outer Brass Casing -->
+                    <circle cx="110" cy="110" r="102" fill="#d97706" stroke="#b45309" stroke-width="4"/>
+                    <circle cx="110" cy="110" r="94" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/>
+                    <circle cx="110" cy="110" r="82" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>
+
+                    <!-- Pressure Conditions Labels -->
+                    <text x="55" y="145" font-size="8" font-weight="bold" fill="#e11d48">STORMY</text>
+                    <text x="50" y="85" font-size="8" font-weight="bold" fill="#d97706">RAIN</text>
+                    <text x="110" y="48" font-size="9" font-weight="bold" fill="#0284c7" text-anchor="middle">CHANGE</text>
+                    <text x="160" y="85" font-size="8" font-weight="bold" fill="#16a34a">FAIR</text>
+                    <text x="155" y="145" font-size="8" font-weight="bold" fill="#2563eb">VERY DRY</text>
+
+                    <!-- Dial Numbers (hPa / mb) -->
+                    <text x="48" y="125" font-size="9" font-weight="bold" fill="#1e293b">960</text>
+                    <text x="56" y="66" font-size="9" font-weight="bold" fill="#1e293b">990</text>
+                    <text x="110" y="36" font-size="9" font-weight="bold" fill="#1e293b" text-anchor="middle">1013</text>
+                    <text x="158" y="66" font-size="9" font-weight="bold" fill="#1e293b">1030</text>
+                    <text x="162" y="125" font-size="9" font-weight="bold" fill="#1e293b">1050</text>
+
+                    <!-- Units Label -->
+                    <text x="110" y="160" font-size="8" font-weight="bold" fill="#64748b" text-anchor="middle">hPa / millibars</text>
+                    <text x="110" y="172" font-size="8" fill="#94a3b8" text-anchor="middle">${inHg} inHg</text>
+
+                    <!-- Indicator Needle -->
+                    <g transform="rotate(${angle} 110 110)">
+                        <line x1="110" y1="110" x2="110" y2="34" stroke="#e11d48" stroke-width="3" stroke-linecap="round"/>
+                        <polygon points="110,28 105,38 115,38" fill="#e11d48"/>
+                        <circle cx="110" cy="110" r="7" fill="#0f172a"/>
+                        <circle cx="110" cy="110" r="3" fill="#ffffff"/>
+                    </g>
+                </svg>
+            `;
+        }
+
+        // Relative Humidity Lookup Table Render Helper (CRITICAL BUG FIX 2)
+        function drawRHLookupTable(highlightDry, highlightDiff) {
+            return `
+                <div class="overflow-x-auto my-2 border border-slate-300 rounded-xl bg-white shadow-sm">
+                    <table class="w-full text-center border-collapse text-[11px]">
+                        <thead>
+                            <tr class="bg-indigo-900 text-white font-bold">
+                                <th class="p-1.5 border border-indigo-800" rowspan="2">Dry Bulb Temp (°C)</th>
+                                <th class="p-1 border border-indigo-800" colspan="7">Difference Between Dry & Wet Bulb Temp (°C)</th>
+                            </tr>
+                            <tr class="bg-indigo-800 text-indigo-100 font-semibold">
+                                <th class="p-1 border border-indigo-700">0°C</th>
+                                <th class="p-1 border border-indigo-700">1°C</th>
+                                <th class="p-1 border border-indigo-700">2°C</th>
+                                <th class="p-1 border border-indigo-700">3°C</th>
+                                <th class="p-1 border border-indigo-700">4°C</th>
+                                <th class="p-1 border border-indigo-700">5°C</th>
+                                <th class="p-1 border border-indigo-700">6°C</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            ${[18, 20, 22, 24, 26, 28].map(temp => `
+                                <tr class="${highlightDry === temp ? 'bg-amber-100 font-bold' : 'hover:bg-slate-50'}">
+                                    <td class="p-1.5 font-bold bg-slate-100 border border-slate-200">${temp}°C</td>
+                                    ${[0, 1, 2, 3, 4, 5, 6].map(d => {
+                                        const isMatch = (highlightDry === temp && highlightDiff === d);
+                                        return `<td class="p-1.5 border border-slate-200 ${isMatch ? 'bg-amber-400 text-indigo-950 font-extrabold text-xs ring-2 ring-amber-500' : ''}">
+                                            ${RH_LOOKUP[temp][d]}%
+                                        </td>`;
+                                    }).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderInteractiveTool(stationId) {
+            const vp = document.getElementById('interactive-viewport');
+
+            switch(stationId) {
+                case 'data-types':
+                    vp.innerHTML = `
+                        <div class="w-full max-w-xl space-y-4">
+                            <p class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Drag & Sort Items into Scientific Categories</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div id="drop-quant" class="bg-blue-50/80 border-2 border-dashed border-blue-300 rounded-2xl p-3 min-h-[160px] flex flex-col items-center">
+                                    <span class="font-heading text-blue-900 text-xs md:text-sm mb-2 flex items-center gap-1"><i class="fa-solid fa-hashtag"></i> Quantitative (Numbers)</span>
+                                    <div class="w-full space-y-2" id="box-quant"></div>
+                                </div>
+                                <div id="drop-qual" class="bg-purple-50/80 border-2 border-dashed border-purple-300 rounded-2xl p-3 min-h-[160px] flex flex-col items-center">
+                                    <span class="font-heading text-purple-900 text-xs md:text-sm mb-2 flex items-center gap-1"><i class="fa-solid fa-font"></i> Qualitative (Words)</span>
+                                    <div class="w-full space-y-2" id="box-qual"></div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap justify-center gap-2 pt-2" id="data-items-pool">
+                                <button onclick="sortItem(this, 'quant')" class="px-3 py-1.5 bg-white shadow-sm border border-slate-300 rounded-xl text-xs font-semibold hover:border-indigo-500 transition">Length: 14.2 cm</button>
+                                <button onclick="sortItem(this, 'qual')" class="px-3 py-1.5 bg-white shadow-sm border border-slate-300 rounded-xl text-xs font-semibold hover:border-indigo-500 transition">Liquid is bright blue</button>
+                                <button onclick="sortItem(this, 'quant')" class="px-3 py-1.5 bg-white shadow-sm border border-slate-300 rounded-xl text-xs font-semibold hover:border-indigo-500 transition">Mass: 85 grams</button>
+                                <button onclick="sortItem(this, 'qual')" class="px-3 py-1.5 bg-white shadow-sm border border-slate-300 rounded-xl text-xs font-semibold hover:border-indigo-500 transition">Smells like vinegar</button>
+                                <button onclick="sortItem(this, 'qual')" class="px-3 py-1.5 bg-white shadow-sm border border-slate-300 rounded-xl text-xs font-semibold hover:border-indigo-500 transition">Effervescent bubbles</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'ruler':
+                    const rVal = practiceState.rulerPos;
+                    vp.innerHTML = `
+                        <div class="w-full max-w-lg space-y-4 text-center">
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 flex justify-center shadow-sm">
+                                ${drawSVGRuler(rVal)}
+                            </div>
+                            <div class="flex flex-wrap items-center justify-center gap-4">
+                                <label class="text-xs font-bold text-slate-600">Slide Ruler Pointer:</label>
+                                <input type="range" min="0.5" max="9.5" step="0.1" value="${rVal}" oninput="practiceState.rulerPos=parseFloat(this.value); renderInteractiveTool('ruler');" class="w-44 accent-indigo-600">
+                                <span class="bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-xl text-sm font-extrabold text-indigo-700">${rVal.toFixed(1)} cm (${Math.round(rVal*10)} mm)</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'cylinder':
+                    const cylVal = practiceState.cylinderVol;
+                    vp.innerHTML = `
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-6 w-full">
+                            ${drawSVGCylinder(cylVal, 50)}
+                            <div class="space-y-4 text-center sm:text-left">
+                                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Meniscus Volume Readout</span>
+                                    <span class="text-3xl font-heading text-indigo-600">${cylVal} mL</span>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-slate-600 block mb-1">Adjust Liquid Volume:</label>
+                                    <input type="range" min="5" max="50" step="1" value="${cylVal}" oninput="practiceState.cylinderVol=parseInt(this.value); renderInteractiveTool('cylinder');" class="accent-indigo-600 w-44">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'spring-scale':
+                    const sf = practiceState.springForce;
+                    vp.innerHTML = `
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-6 w-full">
+                            ${drawSVGSpringScale(sf)}
+                            <div class="space-y-3">
+                                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Force (Newtons)</span>
+                                    <span class="text-2xl font-bold text-indigo-600">${sf.toFixed(1)} N</span>
+                                </div>
+                                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Mass Equiv. (Grams)</span>
+                                    <span class="text-2xl font-bold text-teal-600">${Math.round(sf * 100)} g</span>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-slate-600 block mb-1">Hang Weight Load:</label>
+                                    <input type="range" min="0.5" max="5.0" step="0.1" value="${sf}" oninput="practiceState.springForce=parseFloat(this.value); renderInteractiveTool('spring-scale');" class="accent-indigo-600 w-40">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'psychrometer':
+                    const dry = practiceState.dryTemp;
+                    const wet = practiceState.wetTemp;
+                    const diff = Math.max(0, dry - wet);
+                    const rhVal = (RH_LOOKUP[dry] && RH_LOOKUP[dry][diff] !== undefined) ? RH_LOOKUP[dry][diff] : '--';
+
+                    vp.innerHTML = `
+                        <div class="w-full max-w-xl space-y-3">
+                            <div class="grid grid-cols-2 gap-3 text-center">
+                                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                                    <span class="text-[10px] font-bold text-rose-600 block uppercase">Dry Bulb Temp</span>
+                                    <div class="text-2xl font-bold text-slate-800 my-1">${dry}°C</div>
+                                    <input type="range" min="18" max="28" step="2" value="${dry}" oninput="practiceState.dryTemp=parseInt(this.value); if(practiceState.wetTemp>this.value) practiceState.wetTemp=parseInt(this.value); renderInteractiveTool('psychrometer');" class="w-28 accent-rose-500">
+                                </div>
+                                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                                    <span class="text-[10px] font-bold text-blue-600 block uppercase">Wet Bulb Temp</span>
+                                    <div class="text-2xl font-bold text-slate-800 my-1">${wet}°C</div>
+                                    <input type="range" min="${dry-6}" max="${dry}" step="1" value="${wet}" oninput="practiceState.wetTemp=parseInt(this.value); renderInteractiveTool('psychrometer');" class="w-28 accent-blue-500">
+                                </div>
+                            </div>
+
+                            <div class="bg-indigo-950 text-white rounded-xl p-3 flex justify-around items-center text-center">
+                                <div>
+                                    <span class="text-[10px] text-indigo-300 block uppercase font-bold">Temp Difference</span>
+                                    <span class="text-lg font-bold">${diff}°C</span>
+                                </div>
+                                <div class="h-6 w-px bg-indigo-700"></div>
+                                <div>
+                                    <span class="text-[10px] text-amber-300 block uppercase font-bold">Relative Humidity</span>
+                                    <span class="text-2xl font-heading text-amber-400">${rhVal}%</span>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Chart Lookup -->
+                            ${drawRHLookupTable(dry, diff)}
+                        </div>
+                    `;
+                    break;
+
+                case 'barometer':
+                    const baro = practiceState.baroPressure;
+                    vp.innerHTML = `
+                        <div class="flex flex-col items-center space-y-3">
+                            ${drawSVGBarometer(baro)}
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xs font-bold text-slate-600">Pressure:</span>
+                                <input type="range" min="960" max="1050" value="${baro}" oninput="practiceState.baroPressure=parseInt(this.value); renderInteractiveTool('barometer');" class="accent-indigo-600 w-44">
+                                <span class="bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-xl font-bold text-indigo-700 text-sm">${baro} hPa</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'triple-beam':
+                    const sumMass = (practiceState.tb100 + practiceState.tb10 + practiceState.tb1).toFixed(1);
+                    vp.innerHTML = `
+                        <div class="w-full max-w-2xl space-y-4">
+                            <div class="bg-slate-200 border-2 border-slate-400 rounded-2xl p-4 shadow-inner">
+                                <div class="space-y-3 pl-8 pr-12 relative">
+                                    <div class="bg-slate-300 h-6 rounded border border-slate-400 flex items-center px-2">
+                                        <span class="text-[10px] font-bold text-slate-700 w-16">100g Beam</span>
+                                        <input type="range" min="0" max="500" step="100" value="${practiceState.tb100}" oninput="practiceState.tb100=parseInt(this.value); renderInteractiveTool('triple-beam');" class="w-full accent-indigo-600">
+                                        <span class="text-xs font-bold text-indigo-950 ml-2 w-10 text-right">${practiceState.tb100}g</span>
+                                    </div>
+                                    <div class="bg-slate-300 h-6 rounded border border-slate-400 flex items-center px-2">
+                                        <span class="text-[10px] font-bold text-slate-700 w-16">10g Beam</span>
+                                        <input type="range" min="0" max="90" step="10" value="${practiceState.tb10}" oninput="practiceState.tb10=parseInt(this.value); renderInteractiveTool('triple-beam');" class="w-full accent-indigo-600">
+                                        <span class="text-xs font-bold text-indigo-950 ml-2 w-10 text-right">${practiceState.tb10}g</span>
+                                    </div>
+                                    <div class="bg-slate-300 h-6 rounded border border-slate-400 flex items-center px-2">
+                                        <span class="text-[10px] font-bold text-slate-700 w-16">1g Beam</span>
+                                        <input type="range" min="0" max="10" step="0.1" value="${practiceState.tb1}" oninput="practiceState.tb1=parseFloat(this.value); renderInteractiveTool('triple-beam');" class="w-full accent-indigo-600">
+                                        <span class="text-xs font-bold text-indigo-950 ml-2 w-10 text-right">${practiceState.tb1.toFixed(1)}g</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Total Calculated Mass</span>
+                                <span class="text-3xl font-heading text-indigo-600">${sumMass} g</span>
+                                <p class="text-[11px] text-slate-500 mt-0.5">(${practiceState.tb100}g + ${practiceState.tb10}g + ${practiceState.tb1.toFixed(1)}g)</p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'drawing':
+                    const d = practiceState.drawingItems;
+                    const checkCount = Object.values(d).filter(Boolean).length;
+                    vp.innerHTML = `
+                        <div class="w-full max-w-lg space-y-3">
+                            <p class="text-xs font-bold text-slate-500 text-center uppercase tracking-wider">Scientific Diagram Checklist Evaluator</p>
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <label class="flex items-center space-x-2.5 p-2.5 bg-white border rounded-xl cursor-pointer hover:bg-slate-50">
+                                    <input type="checkbox" ${d.accurate ? 'checked' : ''} onchange="practiceState.drawingItems.accurate=this.checked; renderInteractiveTool('drawing');" class="w-4 h-4 accent-indigo-600">
+                                    <div>
+                                        <span class="text-xs font-bold block text-slate-800">A - Accurate</span>
+                                        <span class="text-[10px] text-slate-500">True shape & proportions</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-center space-x-2.5 p-2.5 bg-white border rounded-xl cursor-pointer hover:bg-slate-50">
+                                    <input type="checkbox" ${d.big ? 'checked' : ''} onchange="practiceState.drawingItems.big=this.checked; renderInteractiveTool('drawing');" class="w-4 h-4 accent-indigo-600">
+                                    <div>
+                                        <span class="text-xs font-bold block text-slate-800">B - Big</span>
+                                        <span class="text-[10px] text-slate-500">Takes up >50% space</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-center space-x-2.5 p-2.5 bg-white border rounded-xl cursor-pointer hover:bg-slate-50">
+                                    <input type="checkbox" ${d.clean ? 'checked' : ''} onchange="practiceState.drawingItems.clean=this.checked; renderInteractiveTool('drawing');" class="w-4 h-4 accent-indigo-600">
+                                    <div>
+                                        <span class="text-xs font-bold block text-slate-800">C - Clean</span>
+                                        <span class="text-[10px] text-slate-500">Clear unshaded lines</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-center space-x-2.5 p-2.5 bg-white border rounded-xl cursor-pointer hover:bg-slate-50">
+                                    <input type="checkbox" ${d.detailed ? 'checked' : ''} onchange="practiceState.drawingItems.detailed=this.checked; renderInteractiveTool('drawing');" class="w-4 h-4 accent-indigo-600">
+                                    <div>
+                                        <span class="text-xs font-bold block text-slate-800">D - Detailed</span>
+                                        <span class="text-[10px] text-slate-500">Ruler-drawn labels</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="p-3 ${checkCount === 4 ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-slate-100 border-slate-200 text-slate-700'} border rounded-xl text-xs font-bold text-center">
+                                ${checkCount === 4 ? '🎉 Perfect Scientific Diagram Rubric Grade: 100%' : `Diagram Rubric Progress: ${checkCount} / 4 Criteria Satisfied`}
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+
+        function sortItem(btn, targetBox) {
+            const quantBox = document.getElementById('box-quant');
+            const qualBox = document.getElementById('box-qual');
+            if (targetBox === 'quant') {
+                quantBox.appendChild(btn);
+                btn.className = "w-full p-2 bg-blue-100 text-blue-950 rounded-lg text-xs font-bold text-left flex justify-between items-center shadow-sm";
+            } else {
+                qualBox.appendChild(btn);
+                btn.className = "w-full p-2 bg-purple-100 text-purple-950 rounded-lg text-xs font-bold text-left flex justify-between items-center shadow-sm";
+            }
+        }
+
+        function renderQuickQuestion(stationId) {
+            const qText = document.getElementById('quick-question-text');
+            const qOpts = document.getElementById('quick-options');
+
+            const QUESTIONS = {
+                'data-types': {
+                    q: 'Which of the following is a QUANTITATIVE observation?',
+                    opts: ['The chemical reaction produced a sour odor', 'The cylinder contains 45.0 mL of liquid', 'The crystal structure is shiny blue', 'The powder feels coarse and rough'],
+                    ans: 1
+                },
+                'ruler': {
+                    q: 'If a wooden block measures 4.7 cm long, how many millimeters (mm) is that?',
+                    opts: ['0.47 mm', '4.7 mm', '47 mm', '470 mm'],
+                    ans: 2
+                },
+                'cylinder': {
+                    q: 'When measuring liquid volume in a glass graduated cylinder, you must read:',
+                    opts: ['The top edge of the liquid rim', 'The bottom of the curved meniscus at eye level', 'Halfway down the base stand', 'At any convenient upward angle'],
+                    ans: 1
+                },
+                'spring-scale': {
+                    q: 'What standard scientific unit of FORCE is measured by a spring scale?',
+                    opts: ['Grams (g)', 'Newtons (N)', 'Milliliters (mL)', 'Pounds (lbs)'],
+                    ans: 1
+                },
+                'psychrometer': {
+                    q: 'If Dry Bulb = 24°C and Wet Bulb = 20°C (Difference = 4°C), what is the Relative Humidity?',
+                    opts: ['100%', '85%', '70%', '50%'],
+                    ans: 2
+                },
+                'barometer': {
+                    q: 'A barometer reading that rapidly drops from 1020 hPa down to 970 hPa indicates:',
+                    opts: ['Approaching stormy / rainy weather', 'Clear sunny weather ahead', 'No atmospheric pressure change', 'Freezing snow'],
+                    ans: 0
+                },
+                'triple-beam': {
+                    q: 'What is the sum mass of riders set to 200g, 30g, and 5.4g?',
+                    opts: ['235.4 g', '230.54 g', '253.4 g', '2354 g'],
+                    ans: 0
+                },
+                'drawing': {
+                    q: 'In the ABCD scientific drawing rule, what does the letter "D" represent?',
+                    opts: ['Digital', 'Detailed with straight ruler-drawn label lines', 'Decorative colors', 'Dark outline shading'],
+                    ans: 1
+                }
+            };
+
+            const data = QUESTIONS[stationId];
+            qText.innerText = data.q;
+            qOpts.innerHTML = data.opts.map((opt, i) => `
+                <button onclick="checkQuickAnswer(${i}, ${data.ans})" class="p-2.5 bg-white border border-slate-200 hover:border-indigo-500 rounded-xl text-xs font-semibold text-left transition hover:bg-indigo-50/50 shadow-sm">
+                    ${opt}
+                </button>
+            `).join('');
+        }
+
+        function checkQuickAnswer(chosen, correct) {
+            const feedback = document.getElementById('quick-feedback');
+            if (chosen === correct) {
+                feedback.className = "text-xs font-bold text-emerald-600";
+                feedback.innerText = "✓ Correct! Excellent!";
+            } else {
+                feedback.className = "text-xs font-bold text-rose-600";
+                feedback.innerText = "✗ Incorrect. Try again!";
+            }
+        }
+
+        // --- ASSESSMENT / EXAM QUESTION BANK & LOGIC ---
+
+        const EXAM_BANK = [
+            {
+                id: 'q1',
+                skill: 'Quantitative vs Qualitative',
+                prompt: 'Classify this lab note: "The beaker contains 125.5 mL of a clear, bubbling solution."',
+                type: 'mc',
+                opts: ['Quantitative Data (Measurement value)', 'Qualitative Data (Sensory description only)', 'Neither Data Type'],
+                ans: 0,
+                render: () => '<div class="p-4 bg-blue-50 border border-blue-200 rounded-xl text-center font-bold text-blue-900 text-lg">"125.5 mL of liquid"</div>'
+            },
+            {
+                id: 'q2',
+                skill: 'Reading a Graduated Cylinder',
+                prompt: 'Read the volume at the bottom of the curved meniscus in this graduated cylinder:',
+                type: 'mc',
+                cylinderVal: 32,
+                opts: ['32 mL', '30 mL', '35 mL', '34 mL'],
+                ans: 0,
+                render: () => drawSVGCylinder(32, 50)
+            },
+            {
+                id: 'q3',
+                skill: 'Sling Psychrometer & RH Chart',
+                prompt: 'The Dry Bulb reads 22°C and the Wet Bulb reads 18°C (Difference = 4°C). Use the lookup chart to find the Relative Humidity (%):',
+                type: 'mc',
+                opts: ['68%', '76%', '84%', '100%'],
+                ans: 0,
+                render: () => drawRHLookupTable(22, 4)
+            },
+            {
+                id: 'q4',
+                skill: 'Reading an Aneroid Barometer',
+                prompt: 'Read the atmospheric pressure indicated on the barometer dial below:',
+                type: 'mc',
+                opts: ['990 hPa', '1013 hPa', '1030 hPa', '960 hPa'],
+                ans: 0,
+                render: () => drawSVGBarometer(990)
+            },
+            {
+                id: 'q5',
+                skill: 'Reading a Spring Scale',
+                prompt: 'Determine the force in Newtons (N) indicated on the spring scale indicator marker:',
+                type: 'mc',
+                opts: ['3.5 N', '1.5 N', '5.0 N', '2.0 N'],
+                ans: 0,
+                render: () => drawSVGSpringScale(3.5)
+            },
+            {
+                id: 'q6',
+                skill: 'Triple Beam Balance Math',
+                prompt: 'Calculate the total mass on the balance beams: 100g beam rider = 100g, 10g beam rider = 50g, 1g decimal rider = 8.4g.',
+                type: 'mc',
+                opts: ['158.4 g', '150.84 g', '1058.4 g', '1584 g'],
+                ans: 0,
+                render: () => `
+                    <div class="bg-slate-200 border border-slate-400 rounded-xl p-4 w-full max-w-md space-y-2 text-xs font-bold text-slate-800">
+                        <div class="bg-white p-2 rounded flex justify-between"><span>100g Beam Rider:</span><span class="text-indigo-600">100 g</span></div>
+                        <div class="bg-white p-2 rounded flex justify-between"><span>10g Beam Rider:</span><span class="text-indigo-600">50 g</span></div>
+                        <div class="bg-white p-2 rounded flex justify-between"><span>1g Beam Rider:</span><span class="text-indigo-600">8.4 g</span></div>
+                    </div>
+                `
+            },
+            {
+                id: 'q7',
+                skill: 'Reading a Metric Ruler',
+                prompt: 'Read the exact length indicated by the red marker line on the metric ruler:',
+                type: 'mc',
+                rulerVal: 5.7,
+                opts: ['5.7 cm (57 mm)', '5.2 cm (52 mm)', '6.7 cm (67 mm)', '4.7 cm (47 mm)'],
+                ans: 0,
+                render: () => drawSVGRuler(5.7)
+            },
+            {
+                id: 'q8',
+                skill: 'Making Scientific Drawings',
+                prompt: 'Which ABCD scientific drawing rule requires drawing label lines with a straight ruler rather than freehand slants?',
+                type: 'mc',
+                opts: ['D - Detailed', 'A - Accurate', 'B - Big', 'C - Clean'],
+                ans: 0,
+                render: () => `<div class="text-5xl text-indigo-600"><i class="fa-solid fa-ruler-combined"></i></div>`
+            },
+            {
+                id: 'q9',
+                skill: 'Quantitative vs Qualitative',
+                prompt: 'Classify this laboratory observation: "The copper strip turned dark reddish-brown and lost its metallic shine."',
+                type: 'mc',
+                opts: ['Qualitative Data', 'Quantitative Data', 'Numerical Data'],
+                ans: 0,
+                render: () => `<div class="p-3 bg-purple-50 border border-purple-200 text-purple-950 rounded-xl text-center font-bold">"Reddish-brown color change"</div>`
+            },
+            {
+                id: 'q10',
+                skill: 'Graduated Cylinder Meniscus',
+                prompt: 'Read the volume of liquid in the graduated cylinder shown below:',
+                type: 'mc',
+                opts: ['18 mL', '20 mL', '15 mL', '22 mL'],
+                ans: 0,
+                render: () => drawSVGCylinder(18, 50)
+            }
+        ];
+
+        function startChallengeExam() {
+            const name = document.getElementById('student-name').value.trim();
+            const cls = document.getElementById('student-class').value.trim();
+
+            if (!name || !cls) {
+                alert('Please enter both your Student Full Name and Class Period before starting!');
+                return;
+            }
+
+            examQuestions = [...EXAM_BANK].sort(() => Math.random() - 0.5);
+            examCurrentIdx = 0;
+            examScore = 0;
+            examAnswersLog = [];
+
+            document.getElementById('exam-setup-card').classList.add('hidden');
+            document.getElementById('exam-active-card').classList.remove('hidden');
+            document.getElementById('exam-report-card').classList.add('hidden');
+
+            renderExamQuestion();
+        }
+
+        function renderExamQuestion() {
+            const q = examQuestions[examCurrentIdx];
+            document.getElementById('exam-q-num').innerText = examCurrentIdx + 1;
+            document.getElementById('exam-q-title').innerText = q.skill;
+            document.getElementById('exam-live-score').innerText = `${examScore} pts`;
+            document.getElementById('exam-question-prompt').innerText = q.prompt;
+            document.getElementById('exam-feedback-msg').innerText = '';
+
+            const stage = document.getElementById('exam-interactive-stage');
+            stage.innerHTML = q.render();
+
+            const ansContainer = document.getElementById('exam-answer-container');
+            ansContainer.innerHTML = q.opts.map((opt, i) => `
+                <label class="flex items-center space-x-3 p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-500 transition shadow-sm">
+                    <input type="radio" name="exam-option" value="${i}" class="w-4 h-4 accent-indigo-600">
+                    <span class="text-xs md:text-sm font-semibold text-slate-800">${opt}</span>
+                </label>
+            `).join('');
+        }
+
+        function submitExamAnswer() {
+            const selected = document.querySelector('input[name="exam-option"]:checked');
+            if (!selected) {
+                alert('Please select an option before proceeding!');
+                return;
+            }
+
+            const chosenIdx = parseInt(selected.value);
+            const q = examQuestions[examCurrentIdx];
+            const isCorrect = (chosenIdx === q.ans);
+
+            if (isCorrect) {
+                examScore += 10;
+            }
+
+            examAnswersLog.push({
+                skill: q.skill,
+                prompt: q.prompt,
+                userAns: q.opts[chosenIdx],
+                correctAns: q.opts[q.ans],
+                correct: isCorrect
+            });
+
+            examCurrentIdx++;
+
+            if (examCurrentIdx < examQuestions.length) {
+                renderExamQuestion();
+            } else {
+                finishExam();
+            }
+        }
+
+        function finishExam() {
+            document.getElementById('exam-active-card').classList.add('hidden');
+            document.getElementById('exam-report-card').classList.remove('hidden');
+
+            const name = document.getElementById('student-name').value;
+            const cls = document.getElementById('student-class').value;
+            const pct = Math.round((examScore / (examQuestions.length * 10)) * 100);
+
+            document.getElementById('report-name').innerText = name;
+            document.getElementById('report-class').innerText = cls;
+            document.getElementById('report-date').innerText = new Date().toLocaleDateString();
+            document.getElementById('report-score-big').innerText = `${pct}%`;
+
+            let verdict = "Keep practicing in Lab Mode to boost your accuracy!";
+            if (pct >= 90) verdict = "🌟 Master Scientist Badge Earned!";
+            else if (pct >= 70) verdict = "👍 Great Job! Ready for Hands-on Science Lab!";
+            document.getElementById('report-verdict').innerText = verdict;
+
+            const breakdown = document.getElementById('report-breakdown');
+            breakdown.innerHTML = examAnswersLog.map((item, idx) => `
+                <div class="p-2.5 rounded-xl border ${item.correct ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950' : 'bg-rose-50/80 border-rose-200 text-rose-950'} flex flex-col gap-1">
+                    <div class="flex justify-between items-center font-bold">
+                        <span>#${idx+1} ${item.skill}</span>
+                        <span class="${item.correct ? 'text-emerald-600' : 'text-rose-600'}">${item.correct ? '✓ Correct (+10 pts)' : '✗ Incorrect (0 pts)'}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600">${item.prompt}</p>
+                    <div class="text-[11px] font-medium mt-0.5">
+                        <span class="block">Your Answer: <b>${item.userAns}</b></span>
+                        ${!item.correct ? `<span class="block text-emerald-700">Correct Answer: <b>${item.correctAns}</b></span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            saveScoreRecord(name, cls, pct);
+            renderScoreboard();
+        }
+
+        function resetChallengeExam() {
+            document.getElementById('exam-setup-card').classList.remove('hidden');
+            document.getElementById('exam-active-card').classList.add('hidden');
+            document.getElementById('exam-report-card').classList.add('hidden');
+        }
+
+        function saveScoreRecord(name, cls, score) {
+            const history = JSON.parse(localStorage.getItem('lab_scores_v2') || '[]');
+            history.unshift({
+                date: new Date().toLocaleDateString(),
+                name: name,
+                class: cls,
+                score: score
+            });
+            localStorage.setItem('lab_scores_v2', JSON.stringify(history.slice(0, 20)));
+        }
+
+        function renderScoreboard() {
+            const rows = document.getElementById('scoreboard-rows');
+            const history = JSON.parse(localStorage.getItem('lab_scores_v2') || '[]');
+
+            if (history.length === 0) {
+                rows.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 font-medium">No assessment history recorded on this browser yet.</td></tr>`;
+                return;
+            }
+
+            rows.innerHTML = history.map(h => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 text-slate-600">${h.date}</td>
+                    <td class="p-3 font-bold text-slate-800">${h.name}</td>
+                    <td class="p-3 text-slate-600">${h.class}</td>
+                    <td class="p-3 font-extrabold text-indigo-600">${h.score}%</td>
+                    <td class="p-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${h.score >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                            ${h.score >= 80 ? 'Mastery Passed' : 'Needs Practice'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function clearScoreHistory() {
+            if (confirm('Are you sure you want to delete all saved student assessment scores?')) {
+                localStorage.removeItem('lab_scores_v2');
+                renderScoreboard();
+            }
+        }
+    </script>
+</body>
+</html>
